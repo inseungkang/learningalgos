@@ -11,8 +11,8 @@ mass = 60
 subjectID = ["AB1"]
 sessionNum = ["2", "3", "4", "5"]
 processedData = np.empty((4,))
-for idx in range(4):
-    processedData[idx] = np.empty((2700,0))
+# for idx in range(4):
+#     processedData[idx] = np.empty((2700,0))
 
 # for subject in subjectID:
 #     for session in sessionNum:
