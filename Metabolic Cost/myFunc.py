@@ -19,10 +19,10 @@ def computeMetabolics(filepath, mass, start_time, end_time):
 
     adapStart_idx = np.abs(timeConv - start_time).argmin()
     if timeConv[adapStart_idx] < start_time:
-        adapStart_idx =+ 1
+        adapStart_idx = adapStart_idx + 1
     adapEnd_idx = np.abs(timeConv - end_time).argmin()
     if timeConv[adapEnd_idx] > end_time:
-        adapEnd_idx =- 1
+        adapEnd_idx = adapEnd_idx - 1
 
     timeConv = timeConv[adapStart_idx:adapEnd_idx].astype(int)-start_time
 
