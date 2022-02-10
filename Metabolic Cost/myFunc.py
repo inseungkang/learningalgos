@@ -29,6 +29,7 @@ def computeMetabolics(filepath, mass, start_time, end_time):
     VO2 = data.iloc[adapStart_idx:adapEnd_idx,4].to_numpy()
     VCO2 = data.iloc[adapStart_idx:adapEnd_idx,6].to_numpy()
     metabolics = (0.278*VO2 + 0.075*VCO2)/mass
+    # metabolics = (16.48/VO2 + 4.48/VCO2)/mass
 
     newData = np.zeros(end_time-start_time)
     for idx, xx in enumerate(metabolics):
