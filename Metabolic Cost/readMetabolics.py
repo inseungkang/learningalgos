@@ -6,14 +6,17 @@ import os
 import myFunc
 import matplotlib.pyplot as plt
 
-current_path = os.getcwd() + "\\Data\\"
-# "/learningalgos/Metabolic Cost/Data/"
-
+current_path = os.getcwd() + "/Data/"
+# "\\Data\\"
 start = 720
 end = 3420
 processedData = [np.empty((2700,0)), np.empty((2700,0)), np.empty((2700,0)), np.empty((2700,0))]
+massPool = [[68.7, 68.7, 67, 67.2],
+            [62, 59, 59.8, 60.3],
+            [59.6, 58.2, 58.4, 58.3],
+            [77.3, 77.7, 78.4, 78.2],
+            [59.5, 59.8, 59.8, 60.3]]
 
-massPool = [[1,2,3,4], [5,6,7,8], [9,10,11,12], [13,14,15,16], [17,18,19,20]] 
 subjectID = ["AB1", "AB2", "AB3", "AB4", "AB5"]
 sessionNum = ["2", "3", "4", "5"]
 
