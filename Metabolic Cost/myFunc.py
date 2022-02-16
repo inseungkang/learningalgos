@@ -40,3 +40,9 @@ def computeMetabolics(filepath, mass, start_time, end_time):
             newData[idx] = newData[idx-1]
 
     return newData
+
+def expFunc(x, A, B, C):
+    return A * np.exp(B*x) + C
+
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
