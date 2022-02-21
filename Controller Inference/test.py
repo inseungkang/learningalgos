@@ -24,11 +24,6 @@ ax = plt.axes(projection='3d')
 ax.plot3D(pelvisPosX[5000:6000], pelvisPosY[5000:6000], pelvisPosZ[5000:6000], 'gray')
 plt.show()
 
-
-
-
-
-
 # fig = plt.figure()
 # ax = plt.axes(projection='3d')
 # ax.plot3D(pelvisPosX[1000:1500],pelvisPosY[1000:1500],pelvisPosZ[1000:1500], 'blue')
