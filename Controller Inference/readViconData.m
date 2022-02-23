@@ -13,12 +13,32 @@ Foot_l_X = mean([ankle_marker_l(:,1), ankle_marker_l(:,4)], 2);
 Foot_l_Y = mean([ankle_marker_l(:,2), ankle_marker_l(:,5)], 2);
 Foot_l_Z = mean([ankle_marker_l(:,3), ankle_marker_l(:,6)], 2);
 
-%% Resampling force data into 100 Hz
-Force_r = []; Force_l = [];
+% Resampling force data into 100 Hz
+Force_r = []; Force_l = []; FP = [];
 for ii = 1:length(treadmill_r)/10
     Force_r(ii,1:9) = treadmill_r(ii*10-9,1:9);
-    Force_l(ii,1:9) = treadmill_r(ii*10-9,1:9);
+    Force_l(ii,1:9) = treadmill_l(ii*10-9,1:9);
+    FP(ii,1:3) = force_plate(ii*10-9,1:3);
 end
+
+%% Sync Data
+start_vec = find(FP(:,3) < -200);
+start_idx = start_vec(1);
+
+COM_pos_X = COM_pos_X(start_idx:start_idx+36000);
+COM_pos_Y = COM_pos_Y(start_idx:start_idx+36000);
+COM_pos_Z = COM_pos_Z(start_idx:start_idx+36000);
+
+Foot_r_X = Foot_r_X(start_idx:start_idx+36000);
+Foot_r_Y = Foot_r_Y(start_idx:start_idx+36000);
+Foot_r_Z = Foot_r_Z(start_idx:start_idx+36000);
+
+Foot_l_X = Foot_l_X(start_idx:start_idx+36000);
+Foot_l_Y = Foot_l_Y(start_idx:start_idx+36000);
+Foot_l_Z = Foot_l_Z(start_idx:start_idx+36000);
+
+Force_r = Force_r(start_idx:start_idx+36000,:);
+Force_l = Force_l(start_idx:start_idx+36000,:);
 %% Computing gait phase for both legs
 index_vec = Force_r(:,3) > -50;
 index_vec = find(diff(index_vec) == -1);
@@ -75,10 +95,10 @@ xlim([5000 5500])
 x1 = 1:length(Force_r(:,3));
 y1 = Force_r(:,3);
 
-footPlacement = [];
+footPlacement = []; 
 
 for ii = 1:length(GP_index)
-    footPlacement = [footPlacement; [GP_index(ii) Foot_r_X(GP_index(ii,1)) Foot_r_Y(GP_index(ii,1))]];
+    footPlacement = [footPlacement; [GP_index(ii) Foot_r_X(GP_index(ii,1))-COM_pos_X(GP_index(ii,1)) Foot_r_Y(GP_index(ii,1))-COM_pos_Y(GP_index(ii,1))]];
 end
 
 subplot(2,1,1)
@@ -90,7 +110,6 @@ plot(footPlacement(:,3), 'o')
 title('Y axis foot placement over steps')
 ylabel('Position in mm')
 xlabel('Steps taken')
-
 %%
 
 close all
