@@ -1,5 +1,8 @@
-clc; clear all; close all;
-load test_data.mat
+%%
+filename = 'AB1_Session1_R1_L1.csv';
+vicon_csv2mat(filename)
+
+
 %%
 COM_pos_X = mean([pelvis_marker(:,1), pelvis_marker(:,4), pelvis_marker(:,7), pelvis_marker(:,10)], 2);
 COM_pos_Y = mean([pelvis_marker(:,2), pelvis_marker(:,5), pelvis_marker(:,8), pelvis_marker(:,11)], 2);
@@ -74,7 +77,7 @@ hold on
 plot(x1, y1, 'o-','Color','blue','MarkerIndices', GP_index(:,1),'MarkerEdgeColor','red','linewidth',2,'MarkerSize',10)
 plot(x1, y1, 'o-','Color','blue','MarkerIndices', GP_index(:,2),'MarkerEdgeColor','green','linewidth',2,'MarkerSize',10)
 title('Vertical GRF with gait events')
-xlabel('Time in every 10 ms)')
+xlabel('Time in every 10 ms')
 ylabel('Force in N')
 xlim([5000 5500])
 
