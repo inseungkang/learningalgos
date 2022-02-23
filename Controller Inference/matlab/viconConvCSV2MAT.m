@@ -1,4 +1,4 @@
-function vicon_csv2mat(filename)
+function viconConvCSV2MAT(filename)
     % load data from VICON csv file
     opts = delimitedTextImportOptions;
     data = readtable(filename,opts);
@@ -40,8 +40,11 @@ function vicon_csv2mat(filename)
     force_plate = data{force_index:marker_index-6,force_col_idx:force_col_idx+2};
     
     % convert string data (cell) into a double array
+    pelvis_marker(cellfun(@isempty,pelvis_marker)) = {'0'};
     pelvis_marker = cellfun(@str2num, pelvis_marker);
+    ankle_marker_r(cellfun(@isempty,ankle_marker_r)) = {'0'};
     ankle_marker_r = cellfun(@str2num, ankle_marker_r);
+    ankle_marker_l(cellfun(@isempty,ankle_marker_l)) = {'0'};
     ankle_marker_l = cellfun(@str2num, ankle_marker_l);
     treadmill_r = cellfun(@str2num, treadmill_r);
     treadmill_l = cellfun(@str2num, treadmill_l);

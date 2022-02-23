@@ -1,4 +1,4 @@
-function [com, foot_r, foot_l, force_r, force_l, fp] = extract_sample_data(pelvis_marker, ankle_marker_r, ankle_marker_l, treadmill_r, treadmill_l, force_plate)
+function [com, foot_r, foot_l, force_r, force_l, fp] = resampleExtractSyncData(pelvis_marker, ankle_marker_r, ankle_marker_l, treadmill_r, treadmill_l, force_plate)
     COM_pos_X = mean([pelvis_marker(:,1), pelvis_marker(:,4), pelvis_marker(:,7), pelvis_marker(:,10)], 2);
     COM_pos_Y = mean([pelvis_marker(:,2), pelvis_marker(:,5), pelvis_marker(:,8), pelvis_marker(:,11)], 2);
     COM_pos_Z = mean([pelvis_marker(:,3), pelvis_marker(:,6), pelvis_marker(:,9), pelvis_marker(:,12)], 2);

@@ -1,7 +1,26 @@
 %%
-filename = 'AB1_Session1_R1_L1.csv';
-vicon_csv2mat(filename)
+clear all; clc;
+filename = 'D:\Vicon Data_CSV\Vicon Data_CSV\AB1_Session1_Right6_Left6.csv';
+opts = delimitedTextImportOptions;
+data = readtable(filename,opts);
 
+%%
+subjectNum = extractBetween(filename,'AB','_');
+
+% obtain index number for markers
+marker_index = find(strcmp(data.Var1, 'Trajectories'))+5;
+RPSI_col_index = find(strcmp(data{marker_index-3,:}, strcat('AB',subjectNum,':RPSI')));
+LPSI_col_index = find(strcmp(data{marker_index-3,:}, strcat('AB',subjectNum,':LPSI')));
+RASI_col_index = find(strcmp(data{marker_index-3,:}, strcat('AB',subjectNum,':RASI')));
+LASI_col_index = find(strcmp(data{marker_index-3,:}, strcat('AB',subjectNum,':LASI')));
+
+pelvis_marker = [data{marker_index:end,RPSI_col_index:RPSI_col_index+2},...
+                 data{marker_index:end,LPSI_col_index:LPSI_col_index+2},...
+                 data{marker_index:end,RASI_col_index:RASI_col_index+2},...
+                 data{marker_index:end,LASI_col_index:LASI_col_index+2}];
+pelvis_marker(cellfun(@isempty,pelvis_marker)) = {'0'};
+%%
+pelvis_marker = cellfun(@str2num, pelvis_marker);
 
 %%
 COM_pos_X = mean([pelvis_marker(:,1), pelvis_marker(:,4), pelvis_marker(:,7), pelvis_marker(:,10)], 2);
