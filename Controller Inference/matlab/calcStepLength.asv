@@ -1,30 +1,26 @@
-clear all; clc;
-load viconData.mat;
+% SLA calculation (based on right foot contact)
 
-%% Session 1
-subjectNum = [1]; sessionNum = [1]; speedNum = [6, 8, 10, 12, 14];
+function SLA = calcStepLength(data, rightSpeed, leftSpeed)
+    heelstrike_r = find(diff(data.Force_R(:,3) > 50) == 1);
+    heelstrike_l = find(diff(data.Force_L(:,3) > 50) == 1);
 
-stepLength = struct;
-for subject = subjectNum
-    for session = sessionNum
-        for speed = speedNum
-            data = viconData.(strcat('AB',num2str(subject))).(strcat('Session',num2str(session))).(strcat('Speed',num2str(speed)));
-            
-            start = find(diff(Force_R(:,3) > 200) == -1); stop = find(diff(Force_R(:,3) > 200) == 1);
-            stance_index = [start(1:end-1), stop(2:end)+1];
-            
-            for ii = 
+    SLA = [];
+    for ii = 1:length(stance_r_idx)
 
-
-            x1 = 1:length(Force_r(:,3));
-            y1 = Force_r(:,3);
-
-
-
-
-
+%         l_idx = find(stance_l_idx(:,1) > stance_r_idx(ii,1) & stance_l_idx(:,1) < stance_r_idx(ii,2));
+        steplength_r = data.Foot_R(heelstrike_r(ii)) - data.Foot_L(heelstrike_r(ii));
+        steplength_l = data.Foot_L(heelstrike_l(ii)) - data.Foot_R(heelstrike_l(ii));
+        
+        if length(steplength_r) > length(steplength_l)
+            steplength_r = steplength_r(1:length(steplength_l));
+        else
+            toeoff_l = toeoff_l(1:length(heelstrike_l));
         end
+
+        if rightSpeed >= leftSpeed
+            SLA = [SLA; (steplength_r - steplength_l)/(steplength_r + steplength_l)];
+        elseif rightSpeed < leftSpeed
+            SLA = [SLA; (steplength_l - steplength_r)/(steplength_r + steplength_l)];    
     end
 end
-
 
