@@ -1,0 +1,30 @@
+clear all; clc;
+load viconData.mat;
+
+%% Session 1
+subjectNum = [1]; sessionNum = [1]; speedNum = [6, 8, 10, 12, 14];
+
+stepLength = struct;
+for subject = subjectNum
+    for session = sessionNum
+        for speed = speedNum
+            data = viconData.(strcat('AB',num2str(subject))).(strcat('Session',num2str(session))).(strcat('Speed',num2str(speed)));
+            
+            start = find(diff(Force_R(:,3) > 200) == -1); stop = find(diff(Force_R(:,3) > 200) == 1);
+            stance_index = [start(1:end-1), stop(2:end)+1];
+            
+            for ii = 
+
+
+            x1 = 1:length(Force_r(:,3));
+            y1 = Force_r(:,3);
+
+
+
+
+
+        end
+    end
+end
+
+

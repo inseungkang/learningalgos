@@ -20,9 +20,6 @@ pelvis_marker = [data{marker_index:end,RPSI_col_index:RPSI_col_index+2},...
                  data{marker_index:end,LASI_col_index:LASI_col_index+2}];
 pelvis_marker(cellfun(@isempty,pelvis_marker)) = {'0'};
 %%
-pelvis_marker = cellfun(@str2num, pelvis_marker);
-
-%%
 COM_pos_X = mean([pelvis_marker(:,1), pelvis_marker(:,4), pelvis_marker(:,7), pelvis_marker(:,10)], 2);
 COM_pos_Y = mean([pelvis_marker(:,2), pelvis_marker(:,5), pelvis_marker(:,8), pelvis_marker(:,11)], 2);
 COM_pos_Z = mean([pelvis_marker(:,3), pelvis_marker(:,6), pelvis_marker(:,9), pelvis_marker(:,12)], 2);
