@@ -2,7 +2,7 @@ clear all; clc;
 file_dir = uigetdir('','select folder containing vicon mat data');
 file_dir = strcat(file_dir,'/');
 % load mat file
-subjectPool = [1];
+subjectPool = [1, 2, 3, 4, 5];
 sessionNum = [1, 2, 3, 4, 5];
 
 viconData = struct;

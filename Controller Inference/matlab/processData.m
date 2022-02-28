@@ -1,7 +1,7 @@
 clear all; clc; close all;
 load viconData.mat;
 
-subjectNum = [1, 2, 3, 4];
+subjectNum = [1];
 sessionNum = [1, 2, 3, 4, 5];
 speedNum = [6, 8, 10, 12, 14];
 
@@ -11,7 +11,7 @@ speedNum = [6, 8, 10, 12, 14];
 
 for subject = subjectNum
     for session = sessionNum
-        if session = 1
+        if session == 1
             for speed = speedNum
                 data = viconData.(strcat('AB',num2str(subject))).(strcat('Session',num2str(session))).(strcat('Speed',num2str(speed)));
                 rightSpeed = speed; leftSpeed = speed;
@@ -19,15 +19,12 @@ for subject = subjectNum
                 SLA = viconData.(strcat('AB',num2str(subject))).(strcat('Session',num2str(session))).(strcat('Speed',num2str(speed))).SLA;
             end
 
-        else
-            for
+            
 
                 
         end
     end
 end
-
-
 
 
 
