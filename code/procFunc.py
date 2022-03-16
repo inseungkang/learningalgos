@@ -1,3 +1,17 @@
+import pickle
+import numpy as np
+
+
+class subjectData:
+        def __init__(self, com, foot_r, foot_l, force_r, force_l, session):
+            self.com = com
+            self.foot_r = foot_r
+            self.foot_l = foot_l
+            self.force_r = force_r
+            self.force_l = force_l
+            self.session = session
+
+
 def c3d_marker_header_loc(filename):
 # extract marker header location for each c3d files
 
@@ -13,6 +27,28 @@ def c3d_marker_header_loc(filename):
           idxList.append(idx)
 
   return idxList
+
+def extract_from_c3d(file_name, index_list, trial_min):
+    b = np.load(file_name)
+    markerData = b['points']
+    forceData = b['analog']
+
+    force_sync = np.mean(forceData[:,14,:], axis=1)
+
+    # main adaptation trial started after 12 min of constant walking
+    sync_start = np.argwhere(abs(force_sync) > np.max(abs(force_sync))/2)[0,0]
+    start_idx = sync_start + 72000
+    end_idx = start_idx + trial_min*6000
+
+    foot_r = markerData[start_idx:end_idx, index_list[4], 0:3]
+    foot_l = markerData[start_idx:end_idx, index_list[5], 0:3]
+    com = np.mean(markerData[start_idx:end_idx, index_list[0:4], 0:3], axis=1)
+    force_r = np.mean(forceData[start_idx:end_idx, 0:3, :], axis=2)
+    force_l = np.mean(forceData[start_idx:end_idx, 6:9, :], axis=2)
+
+    save_name = file_name.split('.npz')[0]+'_synced.pkl'
+    with open(save_name, 'wb') as f:
+        pickle.dump([com, foot_r, foot_l, force_r, force_l], f)
 
 def conv_gc_resample(input_data, stance_idx):
 # Using stance index, segment data out to concat every gait cycle
@@ -58,7 +94,7 @@ def comput_stance_idx(force_right, force_left):
 
   return stance_idx  
 
-def compute_SLA(stance_idx, fast_leg):
+def compute_SLA(stance_idx, foot_r, foot_l, fast_leg):
 # computing SLA with a stance inx input (right and left heel contact)
 # indicate fast leg (0 is right, 1 is left)
   SLA = np.empty([0,])
