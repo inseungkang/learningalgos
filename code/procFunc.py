@@ -1,4 +1,4 @@
-def extract_marker_loc(filename):
+def c3d_marker_header_loc(filename):
 # extract marker header location for each c3d files
 
   with open(filename, 'rb') as handle:
