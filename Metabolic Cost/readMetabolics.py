@@ -48,10 +48,4 @@ y_vec = processedData[0].flatten()
 x_vec = np.array(range(len(y_vec)))
 
 np.save("metabolicData.npy", processedData)
-# params, _  = curve_fit(expFunc, x_vec, y_vec)
-# a, b, c = params[0], params[1], params[2]
-# print(params)
-# yfit = a*np.exp(b*x_vec)+c
-
-# z = np.polyfit(x_vec, y_vec, 30)
 

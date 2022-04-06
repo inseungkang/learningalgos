@@ -1,16 +1,35 @@
-import pickle
+import procFunc as pf
 import numpy as np
+import pandas as pd
+import os
+import fnmatch
+import c3d
+import matplotlib.pyplot as plt
+import pickle
 
+def rolling_window(a, window):
+    shape = a.shape[:-1] + (a.shape[-1] - window + 1, window)
+    strides = a.strides + (a.strides[-1],)
+    return np.lib.stride_tricks.as_strided(a, shape=shape, strides=strides)
+
+def calc_slope(x):
+    slope = np.polyfit(range(len(x)), x, 1)[0]
+    return slope
+
+def moving_average(x, w):
+    return np.convolve(x, np.ones(w), 'valid') / w
 
 class subjectData:
-        def __init__(self, com, foot_r, foot_l, force_r, force_l, session):
+        def __init__(self, subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg):
+            self.subjectNum = subjectNum
+            self.delta = delta
+            self.session = session
             self.com = com
             self.foot_r = foot_r
             self.foot_l = foot_l
             self.force_r = force_r
             self.force_l = force_l
-            self.session = session
-
+            self.fast_leg = fast_leg
 
 def c3d_marker_header_loc(filename):
 # extract marker header location for each c3d files
@@ -72,7 +91,7 @@ def conv_gc_resample(input_data, stance_idx):
   
   return gait_cycle_data[:, :, 1:]
 
-def comput_stance_idx(force_right, force_left):
+def compute_stance_idx(force_right, force_left):
   stance_right = np.where(force_right < -100, 1, np.zeros(len(force_right)))
   stance_start_right = np.where(np.diff(stance_right) == 1)[0]
 
@@ -110,3 +129,136 @@ def compute_SLA(stance_idx, foot_r, foot_l, fast_leg):
     SLA = np.append(SLA, current_sla)
 
   return SLA
+
+def compute_foot_placement(stance_idx, foot_r, foot_l, com):
+  foot_place_mag_r = np.empty([0,])
+  foot_place_mag_l = np.empty([0,])
+
+  for ii in np.arange(len(stance_idx))-1:
+      foot_place_r_x = foot_r[stance_idx[ii,0],0] - com[stance_idx[ii,0],0]
+      foot_place_r_y = foot_r[stance_idx[ii,0],1] - com[stance_idx[ii,0],1]
+      foot_place_r_mag_1 = np.sqrt(foot_place_r_x**2 + foot_place_r_y**2)
+
+      foot_place_r_x = foot_r[stance_idx[ii+1,0],0] - com[stance_idx[ii+1,0],0]
+      foot_place_r_y = foot_r[stance_idx[ii+1,0],1] - com[stance_idx[ii+1,0],1]
+      foot_place_r_mag_2 = np.sqrt(foot_place_r_x**2 + foot_place_r_y**2)
+
+      foot_place_r_mag_delta = foot_place_r_mag_2 - foot_place_r_mag_1
+      foot_place_mag_r = np.append(foot_place_mag_r, foot_place_r_mag_delta)
+  ##
+      foot_place_l_x = foot_l[stance_idx[ii,1],0] - com[stance_idx[ii,1],0]
+      foot_place_l_y = foot_l[stance_idx[ii,1],1] - com[stance_idx[ii,1],1]
+      foot_place_l_mag_1 = np.sqrt(foot_place_l_x**2 + foot_place_l_y**2)
+
+      foot_place_l_x = foot_l[stance_idx[ii+1,1],0] - com[stance_idx[ii+1,1],0]
+      foot_place_l_y = foot_l[stance_idx[ii+1,1],1] - com[stance_idx[ii+1,1],1]
+      foot_place_l_mag_2 = np.sqrt(foot_place_l_x**2 + foot_place_l_y**2)
+
+      foot_place_l_mag_delta = foot_place_l_mag_2 - foot_place_l_mag_1
+      foot_place_mag_l = np.append(foot_place_mag_l, foot_place_l_mag_delta)
+
+  return foot_place_mag_r, foot_place_mag_l
+
+def moving_std(x, w):
+  return np.convolve(x, np.ones(w), 'valid') / w
+
+def compute_foot_placement_y(stance_idx, foot_r, foot_l, com):
+
+  foot_place_mag_r = np.empty([0,])
+  foot_place_mag_l = np.empty([0,])
+
+  for ii in np.arange(len(stance_idx))-1:
+      foot_place_r_y1 = foot_r[stance_idx[ii,0],1] - com[stance_idx[ii,0],1]
+      foot_place_r_y2 = foot_r[stance_idx[ii+1,0],1] - com[stance_idx[ii+1,0],1]
+      foot_place_r_y = foot_place_r_y2 - foot_place_r_y1
+
+      foot_place_l_y1 = foot_l[stance_idx[ii,1],1] - com[stance_idx[ii,1],1]
+      foot_place_l_y2 = foot_l[stance_idx[ii+1,1],1] - com[stance_idx[ii+1,1],1]
+      foot_place_l_y = foot_place_l_y2 - foot_place_l_y1
+
+      foot_place_mag_r = np.append(foot_place_mag_r, foot_place_r_y)
+      foot_place_mag_l = np.append(foot_place_mag_l, foot_place_l_y)
+
+  return foot_place_mag_r, foot_place_mag_l
+
+def load_synced_data():
+  data_dir = '/Users/inseungkang/Documents/learningalgos data/synced data/'
+  file_list = [i for i in os.listdir(data_dir) if '.pkl' in i]
+
+  for file_name in file_list:
+      subjectNum = int(file_name.split('_Session')[0].split('AB')[1])
+      session = int(file_name.split('Session')[1].split('_Right')[0])
+      rSpeed = int(file_name.split('Right')[1].split('_Left')[0])
+      lSpeed = int(file_name.split('Left')[1].split('_synced')[0])
+
+      if rSpeed == 10:
+          delta = int((lSpeed - rSpeed)/2)
+      else:
+          delta = int((rSpeed - lSpeed)/2)
+
+      delta = delta + 2
+      
+      if rSpeed > lSpeed:
+          fast_leg = 0
+      else:
+          fast_leg = 1
+
+      with open(data_dir+file_name, 'rb') as handle:
+          com, foot_r, foot_l, force_r, force_l = pickle.load(handle)
+
+          if subjectNum == 1:
+              if delta == 0:
+                  AB1_delta0 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 1:
+                  AB1_delta1 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 3:
+                  AB1_delta2 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 4:
+                  AB1_delta3 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+
+          if subjectNum == 2:
+              if delta == 0:
+                  AB2_delta0 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 1:
+                  AB2_delta1 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 3:
+                  AB2_delta2 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 4:
+                  AB2_delta3 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+
+          if subjectNum == 3:
+              if delta == 0:
+                  AB3_delta0 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 1:
+                  AB3_delta1 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 3:
+                  AB3_delta2 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 4:
+                  AB3_delta3 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+
+          if subjectNum == 4:
+              if delta == 0:
+                  AB4_delta0 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 1:
+                  AB4_delta1 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 3:
+                  AB4_delta2 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 4:
+                  AB4_delta3 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+
+          if subjectNum == 5:
+              if delta == 0:
+                  AB5_delta0 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 1:
+                  AB5_delta1 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 3:
+                  AB5_delta2 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+              if delta == 4:
+                  AB5_delta3 = pf.subjectData(subjectNum, delta, session, com, foot_r, foot_l, force_r, force_l, fast_leg)
+  result = [AB1_delta0, AB1_delta1, AB1_delta2, AB1_delta3,
+          AB2_delta0, AB2_delta1, AB2_delta2, AB2_delta3,
+          AB3_delta0, AB3_delta1, AB3_delta2, AB3_delta3,
+          AB4_delta0, AB4_delta1, AB4_delta2, AB4_delta3,
+          AB5_delta0, AB5_delta1, AB5_delta2, AB5_delta3]
+
+  return result
