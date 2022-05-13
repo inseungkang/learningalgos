@@ -169,12 +169,19 @@ def compute_foot_placement(foot_r, foot_l, gait_event_idx):
     footXY_hc_l = footXY_l[[int(i) for i in gait_event_idx[:,3].tolist()]]
     return footXY_hc_r, footXY_hc_l
 
-def find_evaluting_range_idx(time_start, range, gait_event_idx):
+def find_evaluting_range_idx_time(time_start, range, gait_event_idx):
     range = range*6000
     start = time_start*6000
     end = start + range
     start = np.argmin(np.abs(gait_event_idx[:,0] - start))
     end = np.argmin(np.abs(gait_event_idx[:,0] - end))
+
+    return start, end
+
+def find_evaluting_range_idx_segment(start, segment_num, gait_event_idx):
+    size = gait_event_idx.shape[0]
+    start = int(size/segment_num)*start
+    end = int(size/segment_num)*start + int(size/segment_num)
 
     return start, end
 
@@ -220,15 +227,19 @@ def extract_trial_info(file_name):
 
   if rSpeed > lSpeed:
     fast_leg = 'right'
+    fSpeed = rSpeed
+    sSpeed = lSpeed
   else:
     fast_leg = 'left'
+    fSpeed = lSpeed
+    sSpeed = rSpeed
 
   if rSpeed == 10:
     delta = lSpeed - rSpeed
   else:
     delta = rSpeed - lSpeed
 
-  return subject, delta, fast_leg
+  return subject, delta, fast_leg, fSpeed, sSpeed
 
 def delta_to_idx(delta):
   if delta == -4:
