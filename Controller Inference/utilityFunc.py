@@ -33,3 +33,11 @@ def low_pass_filter(input_vec):
         output_vec = np.column_stack((output_vec, detrended_vec))
 
     return output_vec[:,1:]
+
+def list_to_array(input_vec):
+  test_vec = np.empty((len(input_vec[0]),1))
+  for ii in np.arange(len(input_vec)):
+    vec = np.expand_dims(np.array(input_vec[ii]), axis=1)
+    test_vec = np.concatenate((test_vec, vec), axis=1)
+  new_vec = test_vec[:,1:]
+  return new_vec
