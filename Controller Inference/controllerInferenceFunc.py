@@ -217,7 +217,7 @@ def controller_fit(delta_P, delta_Q):
     X_gain = np.around(linear_model_X.coef_, 2)
     Y_gain = np.around(linear_model_Y.coef_, 2)
 
-    return X_score, Y_score, X_gain, Y_gain
+    return X_score, Y_score, X_gain, Y_gain, linear_model_X, linear_model_Y
 
 def extract_trial_info(file_name):
 
