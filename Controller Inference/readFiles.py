@@ -4,7 +4,7 @@ import os
 import c3d
 import matplotlib.pyplot as plt
 
-#This function uses the file title to extract the marker's header index number from a C3D file
+#This function uses the file title to extract the marker's header index number from a C3D file (in a full list format)
 def extract_file_info(file_dir):
     file_list = os.listdir(file_dir)
     file_list = [i for i in file_list if 'c3d' in i]
@@ -22,6 +22,18 @@ def extract_file_info(file_dir):
                     header_list.append(idx)
         file_info.append((filename.split('.c3d')[0], header_list))
     return file_info
+
+#This function uses the file title to extract the marker's header index number from a C3D file (directory included)
+def extract_marker_column(filename):
+    reader = c3d.Reader(open(filename, 'rb'))
+    markerLabel = reader.point_labels
+    markerName = ['RASI','LASI','RPSI','LPSI','RANL','LANL']
+    header_list = []
+    for _, name in enumerate(markerName):
+        for idx, label in enumerate(markerLabel):
+            if name == label.strip():
+                header_list.append(idx)
+    return header_list
 
 # This function uses the file input (npz file format) and extract relevant data (marker, force)
 # for the trial time, input in the start time in seconds and duration is in seconds

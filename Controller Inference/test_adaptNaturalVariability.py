@@ -61,6 +61,10 @@ for file in file_info:
         slow_var_std_y = np.std(slow_natural_var_y)
 
 
+
+
+
+
 file_dir = '/Users/inseungkang/Documents/learningalgos data/c3d files_splitbelt/'
 file_info = RF.extract_file_info(file_dir)
 
