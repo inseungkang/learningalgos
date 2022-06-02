@@ -95,19 +95,17 @@ for file in RF.extract_file_info(split_file_dir):
         print(fast_leg)
 
 
-        file_list = os.listdir(tied_file_dir)
-        newlist = []
-        for ii, name in enumerate(file_list):
+        file_list = []
+        for ii, name in enumerate(os.listdir(tied_file_dir)):
             if name != None and 'AB3' in name:
-                newlist.append(name)
+                file_list.append(name)
 
         if fast_leg == 'right':
-            test = 'AB'+str(subject)+'_Right'+str(v_fast)+'_'+'Left'+str(v_slow)
+            condition_name = '_Right'+str(v_fast)+'_'+'Left'+str(v_slow)
         elif fast_leg == 'left':
-            test = 'AB'+str(subject)+'_Right'+str(v_slow)+'_'+'Left'+str(v_fast)      
+            condition_name = '_Right'+str(v_slow)+'_'+'Left'+str(v_fast)      
 
 
-        print(newlist)
         # tied_file_name = 'AB1_Session1_Right6_Left6.c3d'
         # header_list = RF.extract_marker_column(file_dir+file_name)
 
