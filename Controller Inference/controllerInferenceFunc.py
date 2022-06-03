@@ -7,6 +7,7 @@ import pickle
 from scipy import signal
 from sklearn.linear_model import LinearRegression
 import utilityFunc as UF
+import readFiles as RF
 
 def compute_gait_event(com, foot_r, foot_l):
     '''
@@ -251,3 +252,21 @@ def delta_to_idx(delta):
   elif delta == 4:
     out = 3
   return out
+
+
+def computeDeltaPandQ(file_dir, file_header, compute_leg, start_time, stop_time):
+    com, foot_r, foot_l, force_r, force_l = RF.extract_data(file_dir, file_header, start_time, stop_time)
+    gait_event_idx = compute_gait_event(com, foot_r, foot_l)
+    com_cont_r, com_cont_l = compute_continous_com_state(com, foot_r, foot_l)
+    com_ms_r, com_ms_l = compute_com_state_mid_stance(com_cont_r, com_cont_l, gait_event_idx)
+    foot_hc_r, foot_hc_l = compute_foot_placement(foot_r, foot_l, gait_event_idx)
+    delta_P_r, delta_P_l, delta_Q_r, delta_Q_l = detrend_data_filt(com_ms_r, com_ms_l, foot_hc_r, foot_hc_l)
+
+    if compute_leg == 'right':
+        delta_P = delta_P_r
+        delta_Q = delta_Q_r
+    elif compute_leg == 'left':
+        delta_P = delta_P_l
+        delta_Q = delta_Q_l
+        
+    return delta_P, delta_Q, gait_event_idx
