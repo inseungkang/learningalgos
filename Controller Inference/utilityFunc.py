@@ -55,6 +55,15 @@ def zscore(actual, predict, mean, std):
   score = np.mean(np.abs(score))
   return score
 
+def zscore_raw(actual, predict, mean, std):
+  error = actual - predict
+  # mean = np.ones((len(error),1))*mean
+  score = error - mean
+  score = score/std
+  # score = (error - mean)/std
+  # score = np.mean(np.abs(score))
+  return score
+
 def filt_outlier(input_vec):
   test_vec_d = np.abs(np.diff(input_vec))
   for ii in np.arange(len(test_vec_d)):
