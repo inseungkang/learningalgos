@@ -17,7 +17,10 @@ def compute_gait_event(com, foot_r, foot_l):
     this is because com y location will be negative when the foot y is front of com and vice versa
     '''
     # left heel contact and mid stance index based on COM Y position subtracted from left foot Y 
+    b, a = signal.butter(2, 0.125)
     COM_Y_l = com[:,1] - foot_l[:,1]
+    COM_Y_l = signal.filtfilt(b, a, COM_Y_l)
+
     zc = np.where(np.diff(np.sign(COM_Y_l)))[0]
 
     hc_l = []
@@ -33,6 +36,7 @@ def compute_gait_event(com, foot_r, foot_l):
 
     # right heel contact and mid stance index based on COM Y position subtracted from right foot Y 
     COM_Y_r = com[:,1] - foot_r[:,1]
+    COM_Y_r = signal.filtfilt(b, a, COM_Y_r)
     zc = np.where(np.diff(np.sign(COM_Y_r)))[0]
 
     hc_r = []
@@ -251,7 +255,7 @@ def delta_to_idx(delta):
     out = 2
   elif delta == 4:
     out = 3
-  return out
+  return int(out)
 
 
 def computeDeltaPandQ(file_dir, file_header, compute_leg, start_time, stop_time):

@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from scipy import signal
+from sklearn.metrics import mean_squared_error
+
 
 def moving_average(y, N):
   y_final = np.empty(y.shape)
@@ -41,3 +43,21 @@ def list_to_array(input_vec):
     test_vec = np.concatenate((test_vec, vec), axis=1)
   new_vec = test_vec[:,1:]
   return new_vec
+
+def rmse(actual, predict):
+  rms = np.sqrt(mean_squared_error(actual, predict))
+  return rms
+
+def zscore(actual, predict, mean, std):
+  error = actual - predict
+  mean = np.expand_dims(np.ones(len(error))*mean, axis=1)
+  score = ((actual - predict) - mean)/std
+  score = np.mean(np.abs(score))
+  return score
+
+def filt_outlier(input_vec):
+  test_vec_d = np.abs(np.diff(input_vec))
+  for ii in np.arange(len(test_vec_d)):
+      if test_vec_d[ii] > np.std(test_vec_d)*2 and ii > 3:
+          input_vec[ii] = (input_vec[ii-1]+ input_vec[ii+1])/2
+  return input_vec
