@@ -7,7 +7,7 @@ import myFunc
 import matplotlib.pyplot as plt
 
 data = np.load('metabolicData.npy')
-movWindow = 180
+movWindow = 120
 dataRange = 2700-movWindow+1
 
 dataFilt = [np.empty((dataRange,0)), np.empty((dataRange,0)), np.empty((dataRange,0)), np.empty((dataRange,0))]
@@ -24,83 +24,56 @@ for sub_idx in range(5):
         # p = np.poly1d(z)
         dataFilt[del_idx] = np.column_stack((dataFilt[del_idx], y_vec))
         # fitData[del_idx] = np.column_stack((fitData[del_idx], p(np.log(x_vec))))
+import seaborn as sns
+# from matplotlib import rcParams
+# rcParams['font.family'] = 'serif'
+# palette = sns.color_palette("Spectral", 5).as_hex()
+palette = sns.color_palette("Paired_r", 5)
+fig, axs = plt.subplots(5, 4, sharex=True, sharey=True)
+# axs.Axes.set_yticklabels(labels=None)
+axs[0, 0].set_title('-2$\Delta$')
+axs[0, 1].set_title('-1$\Delta$')
+axs[0, 2].set_title('+1$\Delta$')
+axs[0, 3].set_title('+2$\Delta$')
 
-# fig, axs = plt.subplots(5, 4, sharex=True)
-# # axs.Axes.set_yticklabels(labels=None)
-# axs[0, 0].set_title('-2$\Delta$')
-# axs[0, 0].set_ylabel('AB1')
-# axs[1, 0].set_ylabel('AB2')
-# axs[2, 0].set_ylabel('AB3')
-# axs[3, 0].set_ylabel('AB4')
-# axs[4, 0].set_ylabel('AB5')
-
-# axs[0, 0].plot(dataFilt[0][:,0], 'o', color = 'blue', markersize=1)
-# axs[1, 0].plot(dataFilt[0][:,1], 'o', color = 'orange', markersize=1)
-# axs[2, 0].plot(dataFilt[0][:,2], 'o', color = 'green', markersize=1)
-# axs[3, 0].plot(dataFilt[0][:,3], 'o', color = 'red', markersize=1)
-# axs[4, 0].plot(dataFilt[0][:,4], 'o', color = 'purple', markersize=1)
-# # axs[0, 0].plot(fitData[0][:,0], 'k')
-# # axs[1, 0].plot(fitData[0][:,1], 'k')
-# # axs[2, 0].plot(fitData[0][:,2], 'k')
-# # axs[3, 0].plot(fitData[0][:,3], 'k')
-# # axs[4, 0].plot(fitData[0][:,4], 'k')
-
-# axs[0, 1].set_title('-$\Delta$')
-# axs[0, 1].plot(dataFilt[1][:,0], 'o', color = 'blue', markersize=1)
-# axs[1, 1].plot(dataFilt[1][:,1], 'o', color = 'orange', markersize=1)
-# axs[2, 1].plot(dataFilt[1][:,2], 'o', color = 'green', markersize=1)
-# axs[3, 1].plot(dataFilt[1][:,3], 'o', color = 'red', markersize=1)
-# axs[4, 1].plot(dataFilt[1][:,4], 'o', color = 'purple', markersize=1)
-# # axs[0, 1].plot(fitData[1][:,0], 'k')
-# # axs[1, 1].plot(fitData[1][:,1], 'k')
-# # axs[2, 1].plot(fitData[1][:,2], 'k')
-# # axs[3, 1].plot(fitData[1][:,3], 'k')
-# # axs[4, 1].plot(fitData[1][:,4], 'k')
-
-# axs[0, 2].set_title('$\Delta$')
-# axs[0, 2].plot(dataFilt[2][:,0], 'o', color = 'blue', markersize=1)
-# axs[1, 2].plot(dataFilt[2][:,1], 'o', color = 'orange', markersize=1)
-# axs[2, 2].plot(dataFilt[2][:,2], 'o', color = 'green', markersize=1)
-# axs[3, 2].plot(dataFilt[2][:,3], 'o', color = 'red', markersize=1)
-# axs[4, 2].plot(dataFilt[2][:,4], 'o', color = 'purple', markersize=1)
-# # axs[0, 2].plot(fitData[2][:,0], 'k')
-# # axs[1, 2].plot(fitData[2][:,1], 'k')
-# # axs[2, 2].plot(fitData[2][:,2], 'k')
-# # axs[3, 2].plot(fitData[2][:,3], 'k')
-# # axs[4, 2].plot(fitData[2][:,4], 'k')
-
-# axs[0, 3].set_title('2$\Delta$')
-# axs[0, 3].plot(dataFilt[3][:,0], 'o', color = 'blue', markersize=1)
-# axs[1, 3].plot(dataFilt[3][:,1], 'o', color = 'orange', markersize=1)
-# axs[2, 3].plot(dataFilt[3][:,2], 'o', color = 'green', markersize=1)
-# axs[3, 3].plot(dataFilt[3][:,3], 'o', color = 'red', markersize=1)
-# axs[4, 3].plot(dataFilt[3][:,4], 'o', color = 'purple', markersize=1)
-# # axs[0, 3].plot(fitData[3][:,0], 'k')
-# # axs[1, 3].plot(fitData[3][:,1], 'k')
-# # axs[2, 3].plot(fitData[3][:,2], 'k')
-# # axs[3, 3].plot(fitData[3][:,3], 'k')
-# # axs[4, 3].plot(fitData[3][:,4], 'k')
-# fig.suptitle('Metabolic Cost moving 3 min for all subjects across trials')
-# plt.show()
-
-
-
-
-fig, axs = plt.subplots(1, 4, sharex=True)
-axs[0].set_title('-2$\Delta$')
-axs[0].set_ylabel('AB1')
-
-axs[0].plot(dataFilt[0][:,0], 'o', color = 'orange', markersize=1)
-
-axs[1].set_title('-$\Delta$')
-axs[1].plot(dataFilt[1][:,0], 'o', color = 'orange', markersize=1)
-
-
-axs[2].set_title('$\Delta$')
-axs[2].plot(dataFilt[2][:,0], 'o', color = 'orange', markersize=1)
-
-
-axs[3].set_title('2$\Delta$')
-axs[3].plot(dataFilt[3][:,0], 'o', color = 'orange', markersize=1)
-
+axs[0, 0].set_ylabel('AB1')
+axs[1, 0].set_ylabel('AB2')
+axs[2, 0].set_ylabel('AB3')
+axs[3, 0].set_ylabel('AB4')
+axs[4, 0].set_ylabel('AB5')
+xtime = np.arange(dataRange)/60
+for ii in np.arange(4):
+    axs[0, ii].plot(xtime, dataFilt[ii][:,0]/dataFilt[ii][0,0]-1, color = palette[0], linewidth=2.5)
+    axs[1, ii].plot(xtime, dataFilt[ii][:,1]/dataFilt[ii][0,1]-1, color = palette[1], linewidth=2.5)
+    axs[2, ii].plot(xtime, dataFilt[ii][:,2]/dataFilt[ii][0,2]-1, color = palette[2], linewidth=2.5)
+    axs[3, ii].plot(xtime, dataFilt[ii][:,3]/dataFilt[ii][0,3]-1, color = palette[3], linewidth=2.5)
+    axs[4, ii].plot(xtime, dataFilt[ii][:,4]/dataFilt[ii][0,4]-1, color = palette[4], linewidth=2.5)
+# axs[0, 0].plot(fitData[0][:,0], 'k')
+# axs[1, 0].plot(fitData[0][:,1], 'k')
+# axs[2, 0].plot(fitData[0][:,2], 'k')
+# axs[3, 0].plot(fitData[0][:,3], 'k')
+# axs[4, 0].plot(fitData[0][:,4], 'k')
+fig.supylabel('Change in Metabolic Cost (W/kg)',fontweight="bold")
+fig.supxlabel('Time (min)',fontweight="bold")
+fig.suptitle('Metabolic cost during different split-belt walking conditions',fontweight="bold")
 plt.show()
+
+
+
+
+# fig, axs = plt.subplots(1, 4, sharex=True)
+# axs[0].set_title('-2$\Delta$')
+# axs[0].set_ylabel('AB1')
+
+# axs[0].plot(dataFilt[0][:,0], 'o', color = 'orange', markersize=1)
+
+# axs[1].set_title('-$\Delta$')
+# axs[1].plot(dataFilt[1][:,0], 'o', color = 'orange', markersize=1)
+
+# axs[2].set_title('$\Delta$')
+# axs[2].plot(dataFilt[2][:,0], 'o', color = 'orange', markersize=1)
+
+# axs[3].set_title('2$\Delta$')
+# axs[3].plot(dataFilt[3][:,0], 'o', color = 'orange', markersize=1)
+
+# plt.show()
