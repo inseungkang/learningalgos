@@ -71,7 +71,7 @@ tied_npz_dir = '/Users/inseungkang/Documents/learningalgos data/npz files_tiedbe
 
 eval_time = 1
 subject_result = []
-
+subject_result_1 = []
 test_list = os.listdir(split_file_dir)
 # for subjectname in ['AB2']:
 for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
@@ -152,10 +152,10 @@ for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
             # summed_data = split_fast_var_y + split_slow_var_y
             summed_data = ((split_fast_var_x/tied_fast_var_x + split_fast_var_y/tied_fast_var_y + split_slow_var_x/tied_slow_var_x + split_slow_var_y/tied_slow_var_x)/4 - 1)*100
 
-            split_fast_rmse_x[ii] = split_fast_var_x/tied_fast_var_x
-            split_fast_rmse_y[ii] = split_fast_var_y/tied_fast_var_y
-            split_slow_rmse_x[ii] = split_slow_var_x/tied_slow_var_x
-            split_slow_rmse_y[ii] = split_slow_var_y/tied_slow_var_x
+            split_fast_rmse_x[ii] = (split_fast_var_x/tied_fast_var_x-1)*100
+            split_fast_rmse_y[ii] = (split_fast_var_y/tied_fast_var_y-1)*100
+            split_slow_rmse_x[ii] = (split_slow_var_x/tied_slow_var_x-1)*100
+            split_slow_rmse_y[ii] = (split_slow_var_y/tied_slow_var_x-1)*100
             split_summed_rmse[ii] = summed_data
 
         # split_fast_var_x = UF.zscore_raw(fast_model_x.predict(split_delta_P_fast), split_delta_Q_fast[:,0], tied_fast_mean_x, tied_fast_var_x)
@@ -169,7 +169,8 @@ for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
         result_slow_y.append(UF.filt_outlier(split_slow_rmse_y))
         result_sum.append(UF.filt_outlier(split_summed_rmse))
 
-    subject_result.append(result_sum)
+    subject_result.append(result_fast_x)
+    subject_result_1.append(result_fast_y)
 
 #         com, foot_r, foot_l, force_r, force_l = RF.extract_data(split_npz_dir+file_name, file_header, 12, 45)
 #         gait_event_idx = CIF.compute_gait_event(com, foot_r, foot_l)
@@ -186,35 +187,46 @@ for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
 # axs[2].plot(test_gait_idx)
 # plt.show()
 
-fig, axs = plt.subplots(1, 5, sharey=True)
-fig.suptitle('Foot placement exploration during split-belt walking')
+fig, axs = plt.subplots(2, 4, sharey=True)
+fig.suptitle('Single Subject foot placement exploration during split-belt walking')
 
 import seaborn as sns
 colors = sns.color_palette("coolwarm", 4)
 labels = ['-2 Delta','-1 Delta','+1 Delta','+2 Delta']
 zeroline = np.zeros(45)
-for ii in np.arange(4):
-    ax1 = axs[0].plot(subject_result[0][ii], '-o', markersize = 2.5, color=colors[ii], label=labels[ii])
-    ax2 = axs[1].plot(subject_result[1][ii], '-o', markersize = 2.5, color=colors[ii], label=labels[ii])
-    ax3 = axs[2].plot(subject_result[2][ii], '-o', markersize = 2.5, color=colors[ii], label=labels[ii])
-    ax4 = axs[3].plot(subject_result[3][ii], '-o', markersize = 2.5, color=colors[ii], label=labels[ii])    
-    ax5 = axs[4].plot(subject_result[4][ii], '-o', markersize = 2.5, color=colors[ii], label=labels[ii])
-    axs[0].plot(zeroline, color='grey')
-    axs[1].plot(zeroline, color='grey')
-    axs[2].plot(zeroline, color='grey')
-    axs[3].plot(zeroline, color='grey')
-    axs[4].plot(zeroline, color='grey')
+# for ii in np.arange(4):
+ax1 = axs[0,0].plot(subject_result[3][3])
+ax2 = axs[0,1].plot(subject_result[3][3], '-o', markersize = 2.5, color=colors[1], label=labels[1])
+ax3 = axs[0,2].plot(subject_result[3][3], '-o', markersize = 2.5, color=colors[2], label=labels[2])
+ax4 = axs[0,3].plot(subject_result[3][3], '-o', markersize = 2.5, color=colors[3], label=labels[3])    
+
+ax1 = axs[1,0].plot(subject_result_1[3][0])
+ax2 = axs[1,1].plot(subject_result_1[3][1], '-o', markersize = 2.5, color=colors[1], label=labels[1])
+ax3 = axs[1,2].plot(subject_result_1[3][2], '-o', markersize = 2.5, color=colors[2], label=labels[2])
+ax4 = axs[1,3].plot(subject_result_1[3][3], '-o', markersize = 2.5, color=colors[3], label=labels[3])    
+
+axs[0,0].plot(zeroline, color='grey')
+axs[0,1].plot(zeroline, color='grey')
+axs[0,2].plot(zeroline, color='grey')
+axs[0,3].plot(zeroline, color='grey')
+axs[1,0].plot(zeroline, color='grey')
+axs[1,1].plot(zeroline, color='grey')
+axs[1,2].plot(zeroline, color='grey')
+axs[1,3].plot(zeroline, color='grey')
     # axs[0].plot(result_fast_x[ii], color=colors[ii], label=labels[ii])
     # axs[1].plot(result_slow_x[ii], color=colors[ii], label=labels[ii])
     # axs[2].plot(result_fast_y[ii], color=colors[ii], label=labels[ii])
     # axs[3].plot(result_slow_y[ii], color=colors[ii], label=labels[ii])
+# labels = ['-2 Delta','-1 Delta','+1 Delta','+2 Delta']
 
-axs[0].set_title('AB1')
-axs[1].set_title('AB2')
-axs[2].set_title('AB3')
-axs[3].set_title('AB4')
-axs[4].set_title('AB5')
-axs[0].set_ylabel('Exploration relative \n to the baseline variability (%)')
+axs[0,0].set_title('-2 Delta')
+axs[0,1].set_title('-1 Delta')
+axs[0,2].set_title('+1 Delta')
+axs[0,3].set_title('+2 Delta')
+
+axs[0,0].set_ylabel('Fast Y')
+axs[1,0].set_ylabel('Slow Y')
+
 # axs[0].set_ylim([25, 100])
 # axs[1].set_ylim([25, 100])
 # axs[2].set_ylim([25, 100])
@@ -223,7 +235,8 @@ axs[0].set_ylabel('Exploration relative \n to the baseline variability (%)')
 
 # fig.supylabel('Total Foot Placement Exploration (mm)')
 fig.supxlabel("Time (min)")
-plt.legend()
+fig.supylabel('Exploration relative \n to the baseline variability (%)')
+# plt.legend()
 plt.show()
 
 

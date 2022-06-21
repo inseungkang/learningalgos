@@ -150,147 +150,86 @@ plt.show()
 
 
 
-# fig, axs = plt.subplots(2,5)
-# for iii in np.arange(5):
-#     x = np.arange(45)
-#     # fast X
-#     test_vec = np.empty((len(adapt_fastgainX_result[0][:,iii]),1))
-#     for ii in np.arange(5):
-#         vec = np.expand_dims(np.array(adapt_fastgainX_result[ii][:,iii]), axis=1)
-#         test_vec = np.concatenate((test_vec, vec), axis=1)
-#     test_vec = test_vec[:,1:]
-#     test_vec_avg = np.mean(test_vec, axis=1)
-#     test_vec_std = np.std(test_vec, axis=1)
+fig, axs = plt.subplots(2,5)
+for iii in np.arange(5):
+    x = np.arange(45)
+    # fast X
+    test_vec = np.empty((len(adapt_fastgainX_result[0][:,iii]),1))
+    for ii in np.arange(5):
+        vec = np.expand_dims(np.array(adapt_fastgainX_result[ii][:,iii]), axis=1)
+        test_vec = np.concatenate((test_vec, vec), axis=1)
+    test_vec = test_vec[:,1:]
+    test_vec_avg = np.mean(test_vec, axis=1)
+    test_vec_std = np.std(test_vec, axis=1)
 
-#     axs[0,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkred', ecolor='lightcoral', elinewidth=1.5, capsize=0)
-#     # fast Y
-#     test_vec = np.empty((len(adapt_fastgainY_result[0][:,iii]),1))
-#     for ii in np.arange(5):
-#         vec = np.expand_dims(np.array(adapt_fastgainY_result[ii][:,iii]), axis=1)
-#         test_vec = np.concatenate((test_vec, vec), axis=1)
-#     test_vec = test_vec[:,1:]
-#     test_vec_avg = np.mean(test_vec, axis=1)
-#     test_vec_std = np.std(test_vec, axis=1)
+    axs[0,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkred', ecolor='lightcoral', elinewidth=1.5, capsize=0)
+    # fast Y
+    test_vec = np.empty((len(adapt_fastgainY_result[0][:,iii]),1))
+    for ii in np.arange(5):
+        vec = np.expand_dims(np.array(adapt_fastgainY_result[ii][:,iii]), axis=1)
+        test_vec = np.concatenate((test_vec, vec), axis=1)
+    test_vec = test_vec[:,1:]
+    test_vec_avg = np.mean(test_vec, axis=1)
+    test_vec_std = np.std(test_vec, axis=1)
 
-#     axs[1,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkred', ecolor='lightcoral', elinewidth=1.5, capsize=0)
-
-
-#     x = np.arange(45)+0.5
-#     # Slow X
-#     test_vec = np.empty((len(adapt_slowgainX_result[0][:,iii]),1))
-#     for ii in np.arange(5):
-#         vec = np.expand_dims(np.array(adapt_slowgainX_result[ii][:,iii]), axis=1)
-#         test_vec = np.concatenate((test_vec, vec), axis=1)
-#     test_vec = test_vec[:,1:]
-#     test_vec_avg = np.mean(test_vec, axis=1)
-#     test_vec_std = np.std(test_vec, axis=1)
+    axs[1,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkred', ecolor='lightcoral', elinewidth=1.5, capsize=0)
 
 
-#     axs[0,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkblue', ecolor='lightsteelblue', elinewidth=1.5, capsize=0)
-#     # Slow Y
-#     test_vec = np.empty((len(adapt_slowgainY_result[0][:,iii]),1))
-#     for ii in np.arange(5):
-#         vec = np.expand_dims(np.array(adapt_slowgainY_result[ii][:,iii]), axis=1)
-#         test_vec = np.concatenate((test_vec, vec), axis=1)
-#     test_vec = test_vec[:,1:]
-#     test_vec_avg = np.mean(test_vec, axis=1)
-#     test_vec_std = np.std(test_vec, axis=1)
+    x = np.arange(45)+0.5
+    # Slow X
+    test_vec = np.empty((len(adapt_slowgainX_result[0][:,iii]),1))
+    for ii in np.arange(5):
+        vec = np.expand_dims(np.array(adapt_slowgainX_result[ii][:,iii]), axis=1)
+        test_vec = np.concatenate((test_vec, vec), axis=1)
+    test_vec = test_vec[:,1:]
+    test_vec_avg = np.mean(test_vec, axis=1)
+    test_vec_std = np.std(test_vec, axis=1)
 
-#     axs[1,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkblue', ecolor='lightsteelblue', elinewidth=1.5, capsize=0)
-#     axs[0,iii].plot(x, np.ones(len(x))*const10_X[iii],color='k')
-#     axs[1,iii].plot(x, np.ones(len(x))*const10_Y[iii],color='k')
 
-# plt.setp(axs[0,0], title='COM X Pos')
-# plt.setp(axs[0,1], title='COM Z Pos')
-# plt.setp(axs[0,2], title='COM X Vel')
-# plt.setp(axs[0,3], title='COM Y Vel')
-# plt.setp(axs[0,4], title='COM Z Vel')
+    axs[0,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkblue', ecolor='lightsteelblue', elinewidth=1.5, capsize=0)
+    # Slow Y
+    test_vec = np.empty((len(adapt_slowgainY_result[0][:,iii]),1))
+    for ii in np.arange(5):
+        vec = np.expand_dims(np.array(adapt_slowgainY_result[ii][:,iii]), axis=1)
+        test_vec = np.concatenate((test_vec, vec), axis=1)
+    test_vec = test_vec[:,1:]
+    test_vec_avg = np.mean(test_vec, axis=1)
+    test_vec_std = np.std(test_vec, axis=1)
 
-# plt.setp(axs[0,0], ylabel='Foot X')
-# plt.setp(axs[1,0], ylabel='Foot Y')
+    axs[1,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkblue', ecolor='lightsteelblue', elinewidth=1.5, capsize=0)
+    axs[0,iii].plot(x, np.ones(len(x))*const10_X[iii],color='k')
+    axs[1,iii].plot(x, np.ones(len(x))*const10_Y[iii],color='k')
+
+plt.setp(axs[0,0], title='COM X Pos')
+plt.setp(axs[0,1], title='COM Z Pos')
+plt.setp(axs[0,2], title='COM X Vel')
+plt.setp(axs[0,3], title='COM Y Vel')
+plt.setp(axs[0,4], title='COM Z Vel')
+
+plt.setp(axs[0,0], ylabel='Foot X')
+plt.setp(axs[1,0], ylabel='Foot Y')
 # fig.suptitle('Step-to-step controller gain as a function of locomotor adaptation (+2 Delta Case)')
 # plt.legend(['Tied-Belt Baseline','Fast Leg', 'Slow Leg'])
-# # ax = plt.gca()
-# # ax.spines['right'].set_color('none')
-# # ax.spines['top'].set_color('none')
-# plt.show()
+# ax = plt.gca()
+# ax.spines['right'].set_color('none')
+# ax.spines['top'].set_color('none')
+plt.show()
 
 
-# file = open('controllerInferenceConst_14.pkl', 'rb')
-# const_14_info_result = pickle.load(file)
-# const_14_fastgainX_result = pickle.load(file)
-# const_14_fastgainY_result = pickle.load(file)
-# const_14_slowgainX_result = pickle.load(file)
-# const_14_slowgainY_result = pickle.load(file)
-# file.close()
 
-# fig, axs = plt.subplots(2,10)
-# for ii in np.arange(5):
-#     if ii == 0:
-#         color = 'r'
-#     elif ii == 1:
-#         color = 'g'
-#     elif ii == 2:
-#         color = 'b'
-#     elif ii == 3:
-#         color = 'm'
-#     elif ii == 4:
-#         color = 'y'
 
-#     axs[0,0].plot(adapt_fastgainX_result[ii][:,0],'.', color=color)
-#     axs[0,1].plot(adapt_fastgainX_result[ii][:,1],'.', color=color)
-#     axs[0,2].plot(adapt_fastgainX_result[ii][:,2],'.', color=color)
-#     axs[0,3].plot(adapt_fastgainX_result[ii][:,3],'.', color=color)
-#     axs[0,4].plot(adapt_fastgainX_result[ii][:,4],'.', color=color)
-#     axs[0,5].plot(adapt_slowgainX_result[ii][:,0],'.', color=color)
-#     axs[0,6].plot(adapt_slowgainX_result[ii][:,1],'.', color=color)
-#     axs[0,7].plot(adapt_slowgainX_result[ii][:,2],'.', color=color)
-#     axs[0,8].plot(adapt_slowgainX_result[ii][:,3],'.', color=color)
-#     axs[0,9].plot(adapt_slowgainX_result[ii][:,4],'.', color=color)
-#     axs[0,0].plot(const_14_fastgainX_result[ii][:,0],'x', color=color)
-#     axs[0,1].plot(const_14_fastgainX_result[ii][:,1],'x', color=color)
-#     axs[0,2].plot(const_14_fastgainX_result[ii][:,2],'x', color=color)
-#     axs[0,3].plot(const_14_fastgainX_result[ii][:,3],'x', color=color)
-#     axs[0,4].plot(const_14_fastgainX_result[ii][:,4],'x', color=color)
-#     axs[0,5].plot(const_10_fastgainX_result[ii][:,0],'x', color=color)
-#     axs[0,6].plot(const_10_fastgainX_result[ii][:,1],'x', color=color)
-#     axs[0,7].plot(const_10_fastgainX_result[ii][:,2],'x', color=color)
-#     axs[0,8].plot(const_10_fastgainX_result[ii][:,3],'x', color=color)
-#     axs[0,9].plot(const_10_fastgainX_result[ii][:,4],'x', color=color)
+# fast Y
+result = []
+for iii in np.arange(5):
+    test_vec = np.empty((len(adapt_fastgainY_result[0][:,iii]),1))
+    for ii in np.arange(5):
+        vec = np.expand_dims(np.array(adapt_fastgainY_result[ii][:,iii]), axis=1)
+        test_vec = np.concatenate((test_vec, vec), axis=1)
+    test_vec = test_vec[:,1:]
+    test_vec_avg = np.mean(test_vec, axis=1)
+    test_vec_std = np.std(test_vec, axis=1)
 
-#     axs[1,0].plot(adapt_fastgainY_result[ii][:,0],'.', color=color)
-#     axs[1,1].plot(adapt_fastgainY_result[ii][:,1],'.', color=color)
-#     axs[1,2].plot(adapt_fastgainY_result[ii][:,2],'.', color=color)
-#     axs[1,3].plot(adapt_fastgainY_result[ii][:,3],'.', color=color)
-#     axs[1,4].plot(adapt_fastgainY_result[ii][:,4],'.', color=color)
-#     axs[1,5].plot(adapt_fastgainY_result[ii][:,0],'.', color=color)
-#     axs[1,6].plot(adapt_fastgainY_result[ii][:,1],'.', color=color)
-#     axs[1,7].plot(adapt_fastgainY_result[ii][:,2],'.', color=color)
-#     axs[1,8].plot(adapt_fastgainY_result[ii][:,3],'.', color=color)
-#     axs[1,9].plot(adapt_fastgainY_result[ii][:,4],'.', color=color)
-#     axs[1,0].plot(const_14_fastgainY_result[ii][:,0],'x', color=color)
-#     axs[1,1].plot(const_14_fastgainY_result[ii][:,1],'x', color=color)
-#     axs[1,2].plot(const_14_fastgainY_result[ii][:,2],'x', color=color)
-#     axs[1,3].plot(const_14_fastgainY_result[ii][:,3],'x', color=color)
-#     axs[1,4].plot(const_14_fastgainY_result[ii][:,4],'x', color=color)
-#     axs[1,5].plot(const_10_fastgainY_result[ii][:,0],'x', color=color)
-#     axs[1,6].plot(const_10_fastgainY_result[ii][:,1],'x', color=color)
-#     axs[1,7].plot(const_10_fastgainY_result[ii][:,2],'x', color=color)
-#     axs[1,8].plot(const_10_fastgainY_result[ii][:,3],'x', color=color)
-#     axs[1,9].plot(const_10_fastgainY_result[ii][:,4],'x', color=color)
+    result.append(test_vec_avg)
 
-# plt.setp(axs[0,0], title='COM X Pos')
-# plt.setp(axs[0,1], title='COM Z Pos')
-# plt.setp(axs[0,2], title='Fast Leg \n COM X Vel')
-# plt.setp(axs[0,3], title='COM Y Vel')
-# plt.setp(axs[0,4], title='COM Z Vel')
 
-# plt.setp(axs[0,5], title='COM X Pos')
-# plt.setp(axs[0,6], title='COM Z Pos')
-# plt.setp(axs[0,7], title='Slow Leg \n COM X Vel')
-# plt.setp(axs[0,8], title='COM Y Vel')
-# plt.setp(axs[0,9], title='COM Z Vel')
-# plt.setp(axs[0,0], ylabel='Foot X')
-# plt.setp(axs[1,0], ylabel='Foot Y')
-# fig.suptitle('Step-to-step controller gain as a function of locomotor adaptation (+2 Delta Case)')
-# plt.show()
+    # axs[1,iii].errorbar(x, test_vec_avg, yerr=test_vec_std, fmt='o', markersize=2.5, color='darkred', ecolor='lightcoral', elinewidth=1.5, capsize=0)

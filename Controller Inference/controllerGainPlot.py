@@ -1,3 +1,4 @@
+from cgi import test
 import numpy as np
 import pandas as pd
 from scipy.optimize import curve_fit
@@ -17,20 +18,6 @@ import c3d
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-data = np.load('metabolicData.npy')
-movWindow = 120
-dataRange = 2700-movWindow+1
-
-dataFilt = [np.empty((dataRange,0)), np.empty((dataRange,0)), np.empty((dataRange,0)), np.empty((dataRange,0))]
-
-for sub_idx in range(5):
-    for del_idx in range(4):
-        y_vec = np.round(data[del_idx][:,sub_idx].flatten(), 4)
-        y_vec = moving_average(y_vec, movWindow)
-        dataFilt[del_idx] = np.column_stack((dataFilt[del_idx], y_vec))
-
-
-
 
 split_file_dir = '/Users/inseungkang/Documents/learningalgos data/c3d files_splitbelt/'
 tied_file_dir = '/Users/inseungkang/Documents/learningalgos data/c3d files_tiedbelt/'
@@ -38,22 +25,29 @@ split_npz_dir = '/Users/inseungkang/Documents/learningalgos data/npz files_split
 tied_npz_dir = '/Users/inseungkang/Documents/learningalgos data/npz files_tiedbelt/'
 
 eval_time = 1
-subject_result_fasty = []
-subject_result_slowy = []
-tied_fasty = []
-tied_slowy = []
+subject_tied_fastx = []
+subject_tied_slowx = []
+subject_tied_fasty = []
+subject_tied_slowy = []
+subject_split_fastx = []
+subject_split_slowx = []
+subject_split_fasty = []
+subject_split_slowy = []
 
 test_list = os.listdir(split_file_dir)
-for subjectname in ['AB1']:
-# for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
+# for subjectname in ['AB1']:
+for subjectname in ['AB1', 'AB2', 'AB3', 'AB4', 'AB5']:
     newlist = []
     idxlist = []
-    result_fast_x = []
-    result_fast_y = []
-    result_slow_x = []
-    result_slow_y = []
-    result_sum = []
-
+    result_tied_fast_x = []
+    result_tied_fast_y = []
+    result_tied_slow_x = []  
+    result_tied_slow_y = []
+    result_split_fast_x = []
+    result_split_fast_y = []
+    result_split_slow_x = []   
+    result_split_slow_y = []
+        
     for file in test_list:
         if subjectname in file:
             newlist.append(file)
@@ -65,7 +59,7 @@ for subjectname in ['AB1']:
     for file in newlist:
         file_name = file.split('.c3d')[0]+'.npz'
         file_header = RF.extract_marker_column(split_file_dir+file)
-        # print(file_name)
+        print(file_name)
 
         if file_name == 'AB3_Session2_Right10_Left6.npz':
             file_header = [3, 2, 0, 1, 30, 33]
@@ -94,66 +88,105 @@ for subjectname in ['AB1']:
             split_delta_P_fast, split_delta_Q_fast, gait_idx = CIF.computeDeltaPandQ(split_npz_dir+file_name, file_header, 'left', 12, 45)
             split_delta_P_slow, split_delta_Q_slow, gait_idx = CIF.computeDeltaPandQ(split_npz_dir+file_name, file_header, 'right', 12, 45)
 
-        r2_fast_x, r2_fast_y, gain_fast_x, gain_fast_y, fast_model_x, fast_model_y = CIF.controller_fit(delta_P_fast, delta_Q_fast)
-        r2_slow_x, r2_slow_y, gain_slow_x, gain_slow_y, slow_model_x, slow_model_y = CIF.controller_fit(delta_P_slow, delta_Q_slow)
+        _, _, gain_fast_x, gain_fast_y, fast_model_x, fast_model_y = CIF.controller_fit(delta_P_fast, delta_Q_fast)
+        _, _, gain_slow_x, gain_slow_y, slow_model_x, slow_model_y = CIF.controller_fit(delta_P_slow, delta_Q_slow)
+
+        tied_gain_fast_x = gain_fast_x
+        tied_gain_fast_y = gain_fast_y
+        tied_gain_slow_x = gain_slow_x
+        tied_gain_slow_y = gain_slow_y
+
+        _, _, gain_fast_x, gain_fast_y, fast_model_x, _ = CIF.controller_fit(split_delta_P_fast, split_delta_Q_fast)
+        _, _, gain_slow_x, gain_slow_y, slow_model_x, _ = CIF.controller_fit(split_delta_P_slow, split_delta_Q_slow)
+
+        split_gain_fast_x = gain_fast_x
+        split_gain_fast_y = gain_fast_y
+        split_gain_slow_x = gain_slow_x
+        split_gain_slow_y = gain_slow_y
 
 
-        tied_fast_mean_x = np.mean(fast_model_x.predict(delta_P_fast)- delta_Q_fast[:,0])
-        tied_fast_mean_y = np.mean(fast_model_y.predict(delta_P_fast)- delta_Q_fast[:,1])            
-        tied_slow_mean_x = np.mean(slow_model_x.predict(delta_P_slow)- delta_Q_slow[:,0])
-        tied_slow_mean_y = np.mean(slow_model_y.predict(delta_P_slow)- delta_Q_slow[:,1])  
-        tied_fast_var_x = np.std(fast_model_x.predict(delta_P_fast) - delta_Q_fast[:,0])
-        tied_fast_var_y = np.std(fast_model_y.predict(delta_P_fast) - delta_Q_fast[:,1])            
-        tied_slow_var_x = np.std(slow_model_x.predict(delta_P_slow) - delta_Q_slow[:,0])
-        tied_slow_var_y = np.std(slow_model_y.predict(delta_P_slow) - delta_Q_slow[:,1])  
+        result_tied_fast_x.append(tied_gain_fast_x)
+        result_tied_fast_y.append(tied_gain_fast_y)
+        result_tied_slow_x.append(tied_gain_slow_x)    
+        result_tied_slow_y.append(tied_gain_slow_y)        
+        result_split_fast_x.append(split_gain_fast_x)
+        result_split_fast_y.append(split_gain_fast_y)
+        result_split_slow_x.append(split_gain_slow_x)    
+        result_split_slow_y.append(split_gain_slow_y)
 
-        split_fast_rmse_x = np.empty((int(45/eval_time)))
-        split_fast_rmse_y = np.empty((int(45/eval_time)))
-        split_slow_rmse_x = np.empty((int(45/eval_time)))
-        split_slow_rmse_y = np.empty((int(45/eval_time)))
-        split_summed_rmse = np.empty((int(45/eval_time)))
+    subject_tied_fastx.append(result_tied_fast_x)
+    subject_tied_fasty.append(result_tied_fast_y)
+    subject_tied_slowx.append(result_tied_slow_x)
+    subject_tied_slowy.append(result_tied_slow_y)
+    subject_split_fastx.append(result_split_fast_x)
+    subject_split_fasty.append(result_split_fast_y)
+    subject_split_slowx.append(result_split_slow_x)
+    subject_split_slowy.append(result_split_slow_y)
 
-        for ii in np.arange(int(45/eval_time)):
-            start, end = CIF.find_evaluting_range_idx_time(ii, eval_time, gait_idx)
-            split_fast_var_x = np.std(fast_model_x.predict(split_delta_P_fast[start:end,:]) - split_delta_Q_fast[start:end,0])
-            split_fast_var_y = np.std(fast_model_y.predict(split_delta_P_fast[start:end,:]) - split_delta_Q_fast[start:end,1])
-            split_slow_var_x = np.std(slow_model_x.predict(split_delta_P_slow[start:end,:]) - split_delta_Q_slow[start:end,0])
-            split_slow_var_y = np.std(slow_model_y.predict(split_delta_P_slow[start:end,:]) - split_delta_Q_slow[start:end,1])
 
-            summed_data = ((split_fast_var_x/tied_fast_var_x + split_fast_var_y/tied_fast_var_y + split_slow_var_x/tied_slow_var_x + split_slow_var_y/tied_slow_var_x)/4 - 1)*100
+# print(subject_tied_fasty)
+# print(subject_tied_fasty[:][0])
+def test_func(input):
+    mean1 = []
+    mean2 = []
+    mean3 = []
+    mean4 = []
+    mean5 = []
 
-        
-            # split_fast_rmse_x[ii] = split_fast_var_x-tied_fast_var_x
-            split_fast_rmse_y[ii] = split_fast_var_y
-            # split_slow_rmse_x[ii] = split_slow_var_x-tied_slow_var_x
-            split_slow_rmse_y[ii] = split_slow_var_y
-            # split_summed_rmse[ii] = summed_data
+    for delta in np.arange(4):
+        test1 = []
+        test2 = []
+        test3 = []
+        test4 = []
+        test5 = []
+        for subject in np.arange(5):
+            d1_a1 = input[subject][delta][0]
+            d1_a2 = input[subject][delta][1]
+            d1_a3 = input[subject][delta][2]
+            d1_a4 = input[subject][delta][3]
+            d1_a5 = input[subject][delta][4]    
+            test1.append(d1_a1)
+            test2.append(d1_a2)
+            test3.append(d1_a3)
+            test4.append(d1_a4)
+            test5.append(d1_a5)
+        mean1.append(np.mean(test1))
+        mean2.append(np.mean(test2))
+        mean3.append(np.mean(test3))
+        mean4.append(np.mean(test4))  
+        mean5.append(np.mean(test5))  
 
-            # split_fast_rmse_x[ii] = split_fast_var_x 
-            # split_fast_rmse_y[ii] = split_fast_var_y 
-            # split_slow_rmse_x[ii] = split_slow_var_x 
-            # split_slow_rmse_y[ii] = split_slow_var_y 
-            # split_summed_rmse[ii] = summed_data
-        # split_fast_rmse_x = np.sum(UF.filt_outlier(split_fast_rmse_x)- np.ones(45)*tied_fast_var_x)
-        # split_fast_rmse_y = np.sum(UF.filt_outlier(split_fast_rmse_y)- np.ones(45)*tied_fast_var_y)
-        # split_slow_rmse_x = np.sum(UF.filt_outlier(split_slow_rmse_x)- np.ones(45)*tied_slow_var_x)
-        # split_slow_rmse_y = np.sum(UF.filt_outlier(split_slow_rmse_y)- np.ones(45)*tied_slow_var_y)
+    return mean1, mean2, mean3, mean4, mean5
 
-        result_fast_x.append(split_fast_rmse_x)
-        result_fast_y.append(split_fast_rmse_y)
-        result_slow_x.append(split_slow_rmse_x)    
-        result_slow_y.append(split_slow_rmse_y)
 
-        result_sum.append(UF.filt_outlier(split_summed_rmse))
 
-    subject_result_fasty.append(result_fast_y)
-    subject_result_slowy.append(result_slow_y)
-    tied_fasty.append(tied_fast_var_y)
-    tied_slowy.append(tied_slow_var_y)
+m1, m2, m3, m4, m5 = test_func(subject_tied_fasty)
+n1, n2, n3, n4, n5 = test_func(subject_split_fasty)
 
-print(tied_fast_var_y)
-print(tied_slow_var_y)
-# fig, axs = plt.subplots(5, 4, sharey=True)
+
+# print(np.mean(subject_tied_fasty))
+fig, axs = plt.subplots(1, 5)
+
+axs[0].plot(m1, n1,'o')
+axs[1].plot(m2, n2,'o')
+axs[2].plot(m3, n3,'o')
+axs[3].plot(m4, n4,'o')
+axs[4].plot(m5, n5,'o')
+plt.show()
+# axs[0].plot(np.mean(subject_tied_fasty[:][0]), np.mean(subject_split_fasty[:][0]), 'o')
+# axs[0].plot(np.mean(subject_tied_fasty[:][1]), np.mean(subject_split_fasty[:][0]), 'o')
+# axs[0].plot(np.mean(subject_tied_fasty[:][2]), np.mean(subject_split_fasty[:][0]), 'o')
+# axs[0].plot(np.mean(subject_tied_fasty[:][3]), np.mean(subject_split_fasty[:][0]), 'o')
+
+
+# # axs[0].plot(np.mean(subject_tied_fasty[:][4][0]), np.mean(subject_split_fasty[:][4][0]), 'o')
+
+# # axs[1].plot(subject_tied_fasty[0][0][1], subject_split_fasty[0][0][1], 'o')
+# # axs[1].plot(subject_tied_fasty[0][1][1], subject_split_fasty[0][1][1], 'o')
+# # axs[1].plot(subject_tied_fasty[0][2][1], subject_split_fasty[0][2][1], 'o')
+# # axs[1].plot(subject_tied_fasty[0][3][1], subject_split_fasty[0][3][1], 'o')
+
+# plt.show()
 # fig.suptitle('Foot placement exploration during split-belt walking')
 
 # import seaborn as sns
@@ -215,109 +248,6 @@ print(tied_slow_var_y)
 # # axs[0, 3].set_title('+2 delta') 
 # fig.suptitle('Example of plotting exploration with metabolics (AB1)',fontweight="bold")
 # plt.show()
-
-import seaborn as sns
-colors = ['#DF9552', '#80C1DF']
-meta_colors = sns.color_palette("coolwarm", 4)
-
-ax1 = plt.subplot(341)
-ax1.plot(subject_result_fasty[0][2], 'o-',markersize = 2.5, color = colors[0])
-
-ax2 = plt.subplot(342, sharey=ax1)
-ax2.plot(subject_result_slowy[0][2], 'o-',markersize = 2.5, color = colors[1])
-
-ax3 = plt.subplot(343, sharey=ax1)
-ax3.plot(subject_result_fasty[0][3], 'o-',markersize = 2.5, color = colors[0])
-
-ax4 = plt.subplot(344, sharey=ax1)
-ax4.plot(subject_result_slowy[0][3], 'o-',markersize = 2.5, color = colors[1])
-
-
-test = dataFilt[2][:,0]
-testvec = []
-for iii in np.arange(45):
-    value = iii*60+30
-    if value > len(test):
-        value = len(test)-1
-    testvec.append(test[value])
-
-ax5 = plt.subplot(323)
-ax5.plot(testvec, 'o-',markersize = 2.5, color = 'grey')
-
-
-test = dataFilt[3][:,0]
-testvec_1 = []
-for iii in np.arange(45):
-    value = iii*60+30
-    if value > len(test):
-        value = len(test)-1
-    testvec_1.append(test[value])
-
-ax6 = plt.subplot(324, sharey=ax5)
-ax6.plot(testvec_1, 'o-',markersize = 2.5, color = 'grey')
-
-from sklearn.linear_model import LinearRegression
-from matplotlib.offsetbox import AnchoredText
-
-ax7 = plt.subplot(3,4,9)
-ax7.plot(testvec, subject_result_fasty[0][2], 'o', markersize = 2.5, color = colors[0])
-
-x = np.asarray(testvec).reshape(-1,1)
-y = subject_result_fasty[0][2].reshape(-1,1)
-reg = LinearRegression().fit(x, y)
-a ="R2: "+str(round(reg.score(x, y), 3))
-
-at = AnchoredText(
-    a, prop=dict(size=10), frameon=False, loc='upper left')
-ax7.add_artist(at)
-
-ypred = reg.predict(x)
-ax7.plot(x, ypred, 'grey')
-
-ax8 = plt.subplot(3,4,10, sharey=ax7)
-ax8.plot(testvec, subject_result_slowy[0][2], 'o', markersize = 2.5, color = colors[1])
-
-x = np.asarray(testvec).reshape(-1,1)
-y = subject_result_slowy[0][2].reshape(-1,1)
-reg = LinearRegression().fit(x, y)
-a ="R2: "+str(round(reg.score(x, y), 3))
-
-at = AnchoredText(
-    a, prop=dict(size=10), frameon=False, loc='upper left')
-ax8.add_artist(at)
-
-ypred = reg.predict(x)
-ax8.plot(x, ypred, 'grey')
-
-ax9 = plt.subplot(3,4,11, sharey=ax7)
-ax9.plot(testvec_1, subject_result_fasty[0][3], 'o', markersize = 2.5, color = colors[0])
-
-x = np.asarray(testvec_1).reshape(-1,1)
-y = subject_result_fasty[0][3].reshape(-1,1)
-reg = LinearRegression().fit(x, y)
-a ="R2: "+str(round(reg.score(x, y), 3))
-
-at = AnchoredText(
-    a, prop=dict(size=10), frameon=False, loc='upper left')
-ax9.add_artist(at)
-
-ypred = reg.predict(x)
-ax9.plot(x, ypred, 'grey')
-
-ax10 = plt.subplot(3,4,12, sharey=ax7)
-ax10.plot(testvec_1, subject_result_slowy[0][3], 'o', markersize = 2.5, color = colors[1])
-
-x = np.asarray(testvec_1).reshape(-1,1)
-y = subject_result_slowy[0][3].reshape(-1,1)
-reg = LinearRegression().fit(x, y)
-a ="R2: "+str(round(reg.score(x, y), 3))
-
-at = AnchoredText(
-    a, prop=dict(size=10), frameon=False, loc='upper left')
-ax10.add_artist(at)
-
-ypred = reg.predict(x)
-ax10.plot(x, ypred, 'grey')
 
 # y_pred = reg.predict(x)
 
