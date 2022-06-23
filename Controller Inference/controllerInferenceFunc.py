@@ -9,6 +9,62 @@ from sklearn.linear_model import LinearRegression
 import utilityFunc as UF
 import readFiles as RF
 
+def GRF_based_gait_event_idx(com, foot_r, foot_l, force_r, force_l):
+    '''
+    Compute gait event index number (left and right). This will be in the order of left mid stance, right heel contact, right mid stance, and left heel contact
+    This will be used to compute the com state during mid stance and evaluate the foot placement in the following heel contact
+    here, using the com y position and foot y position, compute the mid stance (zero crossing) and heel contact (min value) from the signal: diff(com, foot)
+    this is because com y location will be negative when the foot y is front of com and vice versa
+    '''
+    z_vec = np.abs(force_r[:,2])
+    gait_event = np.zeros(len(z_vec))
+    gait_event[np.where(z_vec > 200)] = 1
+    gait_event_diff = np.diff(gait_event)
+    hc_idx_r = np.where(gait_event_diff == 1)[0]
+
+    ms_idx_r = []
+    for ii in np.arange(len(hc_idx_r)-1):
+            relative_com_pos_y = com[hc_idx_r[ii]:hc_idx_r[ii+1],1] - foot_l[hc_idx_r[ii]:hc_idx_r[ii+1],1]
+            zero_crossing = np.where(np.diff(np.sign(relative_com_pos_y)))[0][0]       #first zc corrpesonding to mid-stance
+            ms_idx_r.append(zero_crossing+hc_idx_r[ii])
+    ms_idx_r = np.asarray(ms_idx_r)
+
+    z_vec = np.abs(force_l[:,2])
+    gait_event = np.zeros(len(z_vec))
+    gait_event[np.where(z_vec > 200)] = 1
+    gait_event_diff = np.diff(gait_event)
+    hc_idx_l = np.where(gait_event_diff == 1)[0]
+
+    ms_idx_l = []
+    for ii in np.arange(len(hc_idx_l)-1):
+            relative_com_pos_y = com[hc_idx_l[ii]:hc_idx_l[ii+1],1] - foot_r[hc_idx_l[ii]:hc_idx_l[ii+1],1]
+            zero_crossing = np.where(np.diff(np.sign(relative_com_pos_y)))[0][0]       #first zc corrpesonding to mid-stance
+            ms_idx_l.append(zero_crossing+hc_idx_l[ii])
+    ms_idx_l = np.asarray(ms_idx_l)
+
+    gait_event_idx = np.empty((0,4))
+    for ii in np.arange(len(hc_idx_r)-1):
+            if ii < len(hc_idx_l)-1:
+                    empty_vec = np.empty((4,))
+                    empty_vec[0] = hc_idx_r[ii]
+
+                    relative_com_pos_y = com[hc_idx_r[ii]:hc_idx_r[ii+1],1] - foot_l[hc_idx_r[ii]:hc_idx_r[ii+1],1]
+                    zero_crossing = np.where(np.diff(np.sign(relative_com_pos_y)))[0][0]       #first zc corrpesonding to mid-stance
+                    empty_vec[1] = hc_idx_r[ii] + zero_crossing
+
+                    next_hc = hc_idx_l[hc_idx_l > hc_idx_r[ii]].min()
+                    empty_vec[2] = next_hc
+
+                    next_hc_ii = np.where(hc_idx_l == next_hc)[0][0]
+                    relative_com_pos_y = com[hc_idx_l[next_hc_ii]:hc_idx_l[next_hc_ii+1],1] - foot_r[hc_idx_l[next_hc_ii]:hc_idx_l[next_hc_ii+1],1]
+                    zero_crossing = np.where(np.diff(np.sign(relative_com_pos_y)))[0][0]       #first zc corrpesonding to mid-stance
+                    empty_vec[3] = next_hc + zero_crossing
+                    
+                    gait_event_idx = np.row_stack((gait_event_idx, empty_vec))
+    return gait_event_idx, ms_idx_r, ms_idx_l, hc_idx_r, hc_idx_l
+
+
+
 def compute_gait_event(com, foot_r, foot_l):
     '''
     Compute gait event index number (left and right). This will be in the order of left mid stance, right heel contact, right mid stance, and left heel contact

@@ -49,8 +49,8 @@ def extract_data(file_dir, file_header, start_time, duration):
 
   foot_r = marker_data[start_idx:end_idx, file_header[4], 0:3]
   foot_l = marker_data[start_idx:end_idx, file_header[5], 0:3]
-  # com = np.mean(marker_data[start_idx:end_idx, file_header[0:4], 0:3], axis=1)
-  com = np.mean(marker_data[start_idx:end_idx, file_header[0:4], 0:3], axis=1)
+  com = np.mean(marker_data[start_idx:end_idx, file_header[2:4], 0:3], axis=1)
+#   com = np.mean(marker_data[start_idx:end_idx, file_header[0:4], 0:3], axis=1)
   force_r = np.mean(force_data[start_idx:end_idx, 0:3, :], axis=2)
   force_l = np.mean(force_data[start_idx:end_idx, 6:9, :], axis=2)
   
