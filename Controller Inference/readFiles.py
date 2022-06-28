@@ -37,7 +37,7 @@ def extract_marker_column(filename):
 
 # This function uses the file input (npz file format) and extract relevant data (marker, force)
 # for the trial time, input in the start time in seconds and duration is in seconds
-def extract_data(file_dir, file_header, start_time, duration):
+def extractMarkerForceData(file_dir, file_header, start_time, duration):
   with np.load(file_dir) as data:
     marker_data = data['points']
     force_data = data['analog']
@@ -49,8 +49,7 @@ def extract_data(file_dir, file_header, start_time, duration):
 
   foot_r = marker_data[start_idx:end_idx, file_header[4], 0:3]
   foot_l = marker_data[start_idx:end_idx, file_header[5], 0:3]
-  com = np.mean(marker_data[start_idx:end_idx, file_header[2:4], 0:3], axis=1)
-#   com = np.mean(marker_data[start_idx:end_idx, file_header[0:4], 0:3], axis=1)
+  com = np.mean(marker_data[start_idx:end_idx, file_header[0:4], 0:3], axis=1)
   force_r = np.mean(force_data[start_idx:end_idx, 0:3, :], axis=2)
   force_l = np.mean(force_data[start_idx:end_idx, 6:9, :], axis=2)
   
