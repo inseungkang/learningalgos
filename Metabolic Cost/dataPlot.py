@@ -3,7 +3,7 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import os
 import math
-import myFunc
+import metabolicFunc as MF
 import matplotlib.pyplot as plt
 
 data = np.load('metabolicData.npy')
@@ -19,7 +19,7 @@ print(data.shape)
 for sub_idx in range(5):
     for del_idx in range(4):
         y_vec = np.round(data[del_idx][:,sub_idx].flatten(), 4)
-        y_vec = myFunc.moving_average(y_vec, movWindow)
+        y_vec = MF.moving_average(y_vec, movWindow)
         # z = np.polyfit(np.log(x_vec), y_vec, 1)
         # p = np.poly1d(z)
         dataFilt[del_idx] = np.column_stack((dataFilt[del_idx], y_vec))
